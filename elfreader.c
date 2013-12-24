@@ -8,14 +8,22 @@
 #include<vector>
 #include<string>
 #include<string.h>
-#define EPRINTF(name,type)\
-	printf(#name type,elf_head.name)
 
 
-extern void printElfHeader(Elf64_Ehdr elf_head);
-extern void printElfSecHeader(Elf64_Shdr elf_sect);
 using namespace std;
+ struct elf_section {
+	char  name[40];
+	Elf64_Shdr header;
+	void * value;
+};
+elf_section *elf_sect;
 std::vector<string> vec;
+Elf64_Ehdr elf_head;
+
+extern void printElfHeader(Elf64_Ehdr& elf_head);
+extern void printElfSecHeader(Elf64_Shdr& elf_sect);
+extern void printElfSec(elf_section &elf_head);
+
 int main(int argc, char ** argv)
 {
 	if(argc != 2)
@@ -23,64 +31,66 @@ int main(int argc, char ** argv)
 		printf("argu not 2");
 		return 1;
 	}
-
 	int fd = open(argv[1], O_RDONLY);
-	Elf64_Ehdr elf_head;
 	read(fd,&elf_head, sizeof elf_head); 
 	printElfHeader(elf_head);
-	Elf64_Shdr *elf_sect  = (Elf64_Shdr *)malloc(elf_head.e_shnum * sizeof(Elf64_Shdr));
+
+	elf_sect  = (elf_section *)malloc(elf_head.e_shnum * sizeof(elf_section));
+
 	lseek(fd, elf_head.e_shoff, SEEK_SET);
-	if(elf_head.e_shentsize != sizeof *elf_sect)
-		printf("sect size %ld", sizeof *elf_sect);
 	for(int i =0; i < elf_head.e_shnum;i++)
 	{
-		read(fd, &elf_sect[i], sizeof *elf_sect);
-		printElfSecHeader(elf_sect[i]);
+		//read header
+		read(fd, &(elf_sect[i].header), sizeof elf_sect[i].header);
 	}
-	for(int j = 0; j < elf_head.e_shnum; j++)
-	{
-		if(elf_sect[j].sh_type == 3)
-		{
-			char name[4096];
-			char *tmp = name ;
-			unsigned long iSize = 0;
-			lseek(fd, elf_sect[j].sh_offset, SEEK_SET);
-			read(fd,name, elf_sect[j].sh_size);
-			while(tmp - name < elf_sect[j].sh_size)
-			{
-				if(*tmp == 0)
-				{
-					tmp += 1;
-					continue;
-				}
 
-				vec.push_back(tmp);
-				tmp += strlen(tmp) + 1;
-			}
-		}
+	for(int i =1; i < elf_head.e_shnum;i++)
+	{
+		elf_sect[i].value = malloc(elf_sect[i].header.sh_size);
+		//read value
+		lseek(fd, elf_sect[i].header.sh_offset, SEEK_SET);
+		read(fd, elf_sect[i].value, elf_sect[i].header.sh_size);
 	}
-	for(int i =0 ; i < vec.size(); i++)
-		printf("%d: %s\n", i, vec[i].c_str());
+
+
+
+	for(int j = 1; j < elf_head.e_shnum; j++)
+	{
+		//read section name
+		strcpy(elf_sect[j].name,(char*)elf_sect[elf_head.e_shstrndx].value + elf_sect[j].header.sh_name);
+
+		printElfSec(elf_sect[j]);
+	}
 
 	free(elf_sect);
-
 	return 0;
 }
-void printElfSecHeader(Elf64_Shdr elf_head)
+
+#define EPRINTF(name,type)\
+	printf(#name type,elf_head.name)
+void printElfSec(elf_section &elf_head)
 {
-	EPRINTF(sh_name, "         	  :%u\n");//section name
-	EPRINTF(sh_type, "         	  :0x%x\n");//type
-	EPRINTF(sh_flags, "        	  :%lu\n");//flags
-	EPRINTF(sh_addr, "         	  :0x%lx\n");//flags
-	EPRINTF(sh_offset, "       	  :0x%lx\n");//
-	EPRINTF(sh_size, "         	  :%lu\n");//
-	EPRINTF(sh_link, "         	  :%u\n");//link to another section
-	EPRINTF(sh_info, "         	  :%u\n");//link to another section
+	EPRINTF(name, "               :%s\n");//type
+	printElfSecHeader(elf_head.header);
+	printf("\n");
+}
+
+void printElfSecHeader(Elf64_Shdr &elf_head)
+{
+//	EPRINTF(sh_name, "         	  :%u\n");//section name
+	EPRINTF(sh_type, "            :0x%x\n");//type
+	EPRINTF(sh_flags, "           :%lu\n");//flags
+	EPRINTF(sh_addr, "            :0x%lx\n");//flags
+	EPRINTF(sh_offset, "          :0x%lx\n");//
+	EPRINTF(sh_size, "            :%lu\n");//
+	EPRINTF(sh_link, "            :%u\n");//link to another section
+	EPRINTF(sh_info, "            :%u\n");//link to another section
 	EPRINTF(sh_addralign, "       :%lu\n");//section alignment
 	EPRINTF(sh_entsize, "         :%lu\n");//entry size if section hold tables
 
 }
-void printElfHeader(Elf64_Ehdr elf_head)
+
+void printElfHeader(Elf64_Ehdr &elf_head)
 {
 	printf("e_ident: ELFMAG0: 0x%x\n", elf_head.e_ident[0]);
 	printf("e_ident: ELFMAG1: %c\n",   elf_head.e_ident[1]);
