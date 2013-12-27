@@ -16,4 +16,12 @@ int main(int argc , char** argv)
 		ERROR_RET("open failed", -1);
 	}
 
+	if(verify_file_format(elf) != 0)
+	{
+		ERROR_RET("verify failed", -1);
+	}
+
+	dump_ehdr(elf);
+	dump_section(elf);
+
 }

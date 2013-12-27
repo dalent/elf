@@ -13,7 +13,7 @@ char *data;
 	(Elf64_Ehdr*)elf->data;})
 
 #define GET_SHDR(elf)\
-	(Elf64_Shdr*)(elf->data);
+	(Elf64_Shdr*)(elf->data + ((Elf64_Ehdr*)(elf->data))->e_shoff);
 
 #define GET_SHDR_SIZE(elf)\
 	((Elf64_Ehdr*)(elf->data))->e_shnum;
@@ -30,5 +30,8 @@ char *data;
 	
 int open_elf(struct ELF_t *elf, char* filename);
 
+extern int verify_file_format(ELF_t * elf);
+extern void dump_ehdr(ELF_t *elf);
+extern void dump_section(ELF_t * elf);
 
 #endif

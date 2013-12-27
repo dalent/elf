@@ -1,12 +1,12 @@
 CC = g++
 SRC = $(wildcard *.cpp)
 OBJS = $(addsuffix .o, $(basename $(SRC)))
-APP = RD
+APP = rd
 CFLAGS = -g -c 
 OFLAGS = -g
 $(APP): $(OBJS)
 	$(CC) $(OFLAGS)  -o $@ $^
-%.o:%.c
-	$(CC) $(CFLAGS) -o $@ $<
+%.o:%.cpp
+	$(CC) $(CFLAGS) -o $@  $<
 clean:
 	rm *.o $(APP)
