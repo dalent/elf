@@ -24,5 +24,7 @@ int main(int argc , char** argv)
 	dump_ehdr(elf);
 	dump_section(elf);
 	dump_symbol(elf);
+	dump_phdr(elf);
+	dump_relac(elf);
 
 }

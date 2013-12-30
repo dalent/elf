@@ -86,13 +86,14 @@ void printSymbol(Elf64_Sym *elf_entity)
 //	EPRINTF(st_info, "            :%c\n");//type
 
 	//printf("name             %s\n", symbol_name(elf_head));
-	printf("st_name              :%s\n",get_sym_name(NULL,elf_entity->st_name)); 
-	printf("bind             %s\n", symbol_bind(*elf_entity));
-	printf("type             %s\n", symbol_type(*elf_entity));
+	printf("st_name            :%s\n",get_sym_name(NULL,elf_entity->st_name)); 
+	printf("bind               :%s\n", symbol_bind(*elf_entity));
+	printf("type               :%s\n", symbol_type(*elf_entity));
 	EPRINTF(st_other, "           :%c\n");//type
 	EPRINTF(st_shndx, "           :%hd\n");//type
 	EPRINTF(st_value, "           :0x%lx\n");//type
-	EPRINTF(st_size, "           :%lu\n");//type
+	EPRINTF(st_size, "            :%lu\n");//type
+	printf("\n");
 }
 
 void dump_symbol(ELF_t* elf)
