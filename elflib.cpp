@@ -7,6 +7,7 @@
 #include<string.h>
 #include<sys/mman.h>
 #include"elflib.h"
+
 int get_file_size(int fd)
 {
 	struct stat st;

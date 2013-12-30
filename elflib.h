@@ -15,6 +15,10 @@ char *data;
 #define GET_SHDR(elf)\
 	(Elf64_Shdr*)(elf->data + ((Elf64_Ehdr*)(elf->data))->e_shoff);
 
+//get section header string tab
+#define GET_SYM_TAB_POS(elf)\
+	((Elf64_Ehdr*)(elf->data))->e_shstrndx
+
 #define GET_SHDR_SIZE(elf)\
 	((Elf64_Ehdr*)(elf->data))->e_shnum;
 
@@ -28,10 +32,12 @@ char *data;
 	return code;\
 }while(0);
 	
-int open_elf(struct ELF_t *elf, char* filename);
+extern int open_elf(struct ELF_t *elf, char* filename);
+extern char* elf_offset(ELF_t* elf, int offset);
 
 extern int verify_file_format(ELF_t * elf);
 extern void dump_ehdr(ELF_t *elf);
 extern void dump_section(ELF_t * elf);
+extern void dump_symbol(ELF_t *elf_entity);
 
 #endif

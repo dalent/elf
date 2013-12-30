@@ -1,4 +1,11 @@
 #include"elflib.h"
+#include<map>
+#include<string>
+#include<vector>
+#include<string.h>
+using namespace std;
+extern std::map<unsigned , std::vector<pair<string,Elf64_Shdr*> > > g_mapSectionHeader;
+typedef std::map<unsigned , std::vector<pair<string, Elf64_Shdr*> > >::iterator SEC_ITE;
 const char * symbol_type(Elf64_Sym &sym)
 {
 	const char * ret;
@@ -45,12 +52,41 @@ const char * symbol_bind(Elf64_Sym &sym)
 	return ret;
 }
 
+const char* get_sym_name(ELF_t* elf,unsigned offset)
+{
+	//get the symbol name
+	static const char * s_name = NULL;
+	if(s_name == NULL && elf != NULL)
+	{
+		SEC_ITE str_ite = g_mapSectionHeader.find(SHT_STRTAB);
+		if(str_ite != g_mapSectionHeader.end())
+		{
+			std::vector<pair<string ,Elf64_Shdr*> >::iterator ite_tmp =  str_ite->second.begin();
+			while(ite_tmp != str_ite->second.end())
+			{
+				if(strcasecmp(ite_tmp->first.c_str(), ".strtab") == 0)//tag name is strtab
+				{
+					s_name =(const char*)elf_offset(elf, (*ite_tmp).second->sh_offset); 
+					break;
+				}
+
+				ite_tmp++;
+			}
+		}
+	}
+
+	if(s_name == NULL)
+		return NULL;
+
+	return &s_name[offset];
+}
 void printSymbol(Elf64_Sym *elf_entity)
 {
 //	EPRINTF(st_name, "            :%u\n");//name
 //	EPRINTF(st_info, "            :%c\n");//type
 
 	//printf("name             %s\n", symbol_name(elf_head));
+	printf("st_name              :%s\n",get_sym_name(NULL,elf_entity->st_name)); 
 	printf("bind             %s\n", symbol_bind(*elf_entity));
 	printf("type             %s\n", symbol_type(*elf_entity));
 	EPRINTF(st_other, "           :%c\n");//type
@@ -58,3 +94,28 @@ void printSymbol(Elf64_Sym *elf_entity)
 	EPRINTF(st_value, "           :0x%lx\n");//type
 	EPRINTF(st_size, "           :%lu\n");//type
 }
+
+void dump_symbol(ELF_t* elf)
+{
+	//init it
+	get_sym_name(elf,0);
+
+	//find the symbol table
+	SEC_ITE ite = g_mapSectionHeader.find(SHT_SYMTAB);
+	if(ite != g_mapSectionHeader.end())
+	{
+		std::vector<pair<string, Elf64_Shdr*> >::iterator ite_tmp =  ite->second.begin();
+		while(ite_tmp != ite->second.end())
+		{
+			int size = (*ite_tmp).second->sh_size / (*ite_tmp).second->sh_entsize;
+			Elf64_Sym *sym = (Elf64_Sym*)elf_offset(elf, (*ite_tmp).second->sh_offset);
+
+			for(int i = 1; i < size; i++)
+				printSymbol(&sym[i]);
+
+			ite_tmp++;
+		}
+
+	}
+}
+

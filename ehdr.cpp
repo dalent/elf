@@ -1,5 +1,23 @@
 #include"elflib.h"
 #include<stdio.h>
+#define CASE_BREAK(type)\
+	case type:         ret=#type; break
+const char* get_ei_type(unsigned short type)
+{
+	char const *ret;
+	switch(type)
+	{
+		CASE_BREAK(ELFCLASSNONE);
+		CASE_BREAK(ELFCLASS32);
+		CASE_BREAK(ELFCLASS64);
+		CASE_BREAK(ELFCLASSNUM);
+		default:
+			ret = "unknown";
+			break;
+	}
+
+	return ret;
+}
 void dump_ehdr(ELF_t *elf)
 {
 	Elf64_Ehdr* elf_entity = GET_EHDR(elf);
@@ -12,7 +30,8 @@ void dump_ehdr(ELF_t *elf)
 	printf("e_ident: EI_DATA: %d\n",elf_entity->e_ident[5]);
 	printf("e_ident: EI_VERSION: %d\n",elf_entity->e_ident[6]);
 	printf("e_ident: EI_PAD: %d\n",elf_entity->e_ident[7]);
-	EPRINTF(e_type, "        :%hd\n");//object file type
+//	EPRINTF(e_type, "        :%hd\n");//object file type
+	printf("e_type:          :%s\n",get_ei_type(elf_entity->e_type));
 	EPRINTF(e_machine, "     :%hd\n");//architecture
 	EPRINTF(e_version, "     :%d\n");//object file version
 	EPRINTF(e_entry, "       :0x%lx\n");//virtual address
