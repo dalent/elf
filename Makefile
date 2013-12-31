@@ -9,4 +9,4 @@ $(APP): $(OBJS)
 %.o:%.cpp
 	$(CC) $(CFLAGS) -o $@  $<
 clean:
-	-rm *.o $(APP) >/dev/null 2>1& 
+	-rm *.o $(APP) >/dev/null 2>&1 

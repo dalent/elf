@@ -1,3 +1,7 @@
+/*
+ * dynamic linking table is familiar to symbol.cpp
+ * dynamic is very important for dynamic linking so i put it here.
+ */
 #include"elflib.h"
 #include<map>
 #include<string>
@@ -6,7 +10,7 @@
 using namespace std;
 extern std::map<unsigned , std::vector<pair<string,Elf64_Shdr*> > > g_mapSectionHeader;
 typedef std::map<unsigned , std::vector<pair<string, Elf64_Shdr*> > >::iterator SEC_ITE;
-const char * symbol_type(Elf64_Sym &sym)
+static const char * symbol_type(Elf64_Sym &sym)
 {
 	const char * ret;
 	switch(ELF64_ST_TYPE(sym.st_info))
@@ -27,7 +31,7 @@ const char * symbol_type(Elf64_Sym &sym)
 	return ret;
 }
 
-const char * symbol_bind(Elf64_Sym &sym)
+static const char * symbol_bind(Elf64_Sym &sym)
 {
 	const char * ret;
 	switch(ELF64_ST_BIND(sym.st_info))
@@ -52,7 +56,7 @@ const char * symbol_bind(Elf64_Sym &sym)
 	return ret;
 }
 
-const char* get_sym_name(ELF_t* elf,unsigned offset)
+static const char* get_sym_name(ELF_t* elf,unsigned offset)
 {
 	//get the symbol name
 	static const char * s_name = NULL;
@@ -64,7 +68,7 @@ const char* get_sym_name(ELF_t* elf,unsigned offset)
 			std::vector<pair<string ,Elf64_Shdr*> >::iterator ite_tmp =  str_ite->second.begin();
 			while(ite_tmp != str_ite->second.end())
 			{
-				if(strcasecmp(ite_tmp->first.c_str(), ".strtab") == 0)//tag name is strtab
+				if(strcasecmp(ite_tmp->first.c_str(), ".dynstr") == 0)//tag name is dyntab
 				{
 					s_name =(const char*)elf_offset(elf, (*ite_tmp).second->sh_offset); 
 					break;
@@ -80,8 +84,11 @@ const char* get_sym_name(ELF_t* elf,unsigned offset)
 
 	return &s_name[offset];
 }
-void printSymbol(Elf64_Sym *elf_entity)
+
+std::vector<Elf64_Sym*> g_vecSym;
+static void printSymbol(Elf64_Sym *elf_entity)
 {
+
 //	EPRINTF(st_name, "            :%u\n");//name
 //	EPRINTF(st_info, "            :%c\n");//type
 
@@ -95,14 +102,23 @@ void printSymbol(Elf64_Sym *elf_entity)
 	EPRINTF(st_size, "            :%lu\n");//type
 	printf("\n");
 }
-
-void dump_symbol(ELF_t* elf)
+const char* get_dyn_syn_name(unsigned offset)
 {
+	if(offset >= g_vecSym.size())
+		return "";
+	
+	return get_sym_name(NULL,g_vecSym[offset-1]->st_name);
+}
+
+void dump_dynamic(ELF_t* elf)
+{
+	static int init = 0;
 	//init it
-	get_sym_name(elf,0);
+	if(init == 0)
+		get_sym_name(elf,0);
 
 	//find the symbol table
-	SEC_ITE ite = g_mapSectionHeader.find(SHT_SYMTAB);
+	SEC_ITE ite = g_mapSectionHeader.find(SHT_DYNSYM);
 	if(ite != g_mapSectionHeader.end())
 	{
 		std::vector<pair<string, Elf64_Shdr*> >::iterator ite_tmp =  ite->second.begin();
@@ -112,10 +128,17 @@ void dump_symbol(ELF_t* elf)
 			Elf64_Sym *sym = (Elf64_Sym*)elf_offset(elf, (*ite_tmp).second->sh_offset);
 
 			for(int i = 1; i < size; i++)
+			{
+				if(init == 0)
+					g_vecSym.push_back(&sym[i]);
+
 				printSymbol(&sym[i]);
+			}
 
 			ite_tmp++;
 		}
 	}
+
+	init = 1;
 }
 

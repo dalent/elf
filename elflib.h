@@ -50,6 +50,8 @@ extern void dump_symbol(ELF_t *elf_entity);
 
 extern void dump_phdr(ELF_t *elf);
 extern void dump_relac(ELF_t *elf);
+extern void dump_dynamic(ELF_t* elf);
+extern const char* get_dyn_syn_name(unsigned offset);
 //for now i moved it here
 #include<map>
 #include<string>
