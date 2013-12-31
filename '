@@ -3,28 +3,24 @@
 #include<vector>
 #include<string>
 using namespace std;
-#define APRINTF(name,type)\
-	printf(type,elf_entity->name)
-
 void PrintElfSec(Elf64_Shdr*elf_entity, const char * name)
 {
-	//APRINTF(sh_name, "         	  :%-u\n");//section name
-	printf("%-20s", &name[elf_entity->sh_name]);//section name
-	APRINTF(sh_type, "%-10x");//type
-	APRINTF(sh_flags, "%-10lu");//flags
-	APRINTF(sh_addr, "%-10lx");//flags
-	APRINTF(sh_offset, "%-10lx");//
-	APRINTF(sh_size, "%-10lu");//
-	APRINTF(sh_link, "%-10u");//link to another section
-	APRINTF(sh_info, "%-10u");//link to another section
-	APRINTF(sh_addralign, "%-10lu");//section alignment
-	APRINTF(sh_entsize, "%-10lu");//entry size if section hold tables
+	//EPRINTF(sh_name, "         	  :%u\n");//section name
+	printf(":%10s", &name[elf_entity->sh_name]);//section name
+	EPRINTF(sh_type, "            :0x%x\n");//type
+	EPRINTF(sh_flags, "           :%lu\n");//flags
+	EPRINTF(sh_addr, "            :0x%lx\n");//flags
+	EPRINTF(sh_offset, "          :0x%lx\n");//
+	EPRINTF(sh_size, "            :%lu\n");//
+	EPRINTF(sh_link, "            :%u\n");//link to another section
+	EPRINTF(sh_info, "            :%u\n");//link to another section
+	EPRINTF(sh_addralign, "       :%lu\n");//section alignment
+	EPRINTF(sh_entsize, "         :%lu\n");//entry size if section hold tables
 	printf("\n");
 }
 void PrintHeader()
 {
-	printf("%-20s%-10s%-10s%-10s%-10s%-10s%-10s%-10s%-10s%-10s","name","type","flags","addr","offset","size","link","info","addralign","entsize");
-	printf("\n");
+	printf("%10s%10s%10s%10s%10s%10s%10s%10s%10s%10s","name","type","flags","addr","offset","size","link","info","addralign","entsize");
 }
 
 std::map<unsigned, std::vector<std::pair<string,Elf64_Shdr*> > > g_mapSectionHeader;
