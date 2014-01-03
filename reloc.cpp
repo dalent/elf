@@ -25,26 +25,43 @@ const char* get_type(unsigned long type)
 }
 void print_rel(Elf64_Rel *elf_entity)
 {
-	EPRINTF(r_offset, "         :0x%lx\n");//type
-	printf("symbol            :%lu\n", ELF64_R_SYM(elf_entity->r_info));
-	printf("type              :%s\n", get_type(ELF64_R_TYPE(elf_entity->r_info)));
-	EPRINTF(r_info, "           :0x%lx\n");//type
+//	EPRINTF(r_offset, "         :0x%lx\n");//type
+//	printf("symbol            :%lu\n", ELF64_R_SYM(elf_entity->r_info));
+//	printf("type              :%s\n", get_type(ELF64_R_TYPE(elf_entity->r_info)));
+//	EPRINTF(r_info, "           :0x%lx\n");//type
+//	printf("\n");
+
+	printf("%s%8lx","0x", elf_entity->r_info);
+	printf("%10s", get_dyn_syn_name(ELF64_R_SYM(elf_entity->r_info)));
+	printf("%10s",get_type(ELF64_R_TYPE(elf_entity->r_info))); 
+	printf("%10lx", elf_entity->r_info);
 	printf("\n");
 }
 
 void print_rela(Elf64_Rela*elf_entity)
 {
-	EPRINTF(r_offset, "           :0x%lx\n");//type
-	//printf("symbol             :%lu\n", ELF64_R_SYM(elf_entity->r_info));
-	printf("symbol name          :%s\n",get_dyn_syn_name(ELF64_R_SYM(elf_entity->r_info)));
-	printf("type               :%s\n", get_type(ELF64_R_TYPE(elf_entity->r_info)));
-	EPRINTF(r_info, "             :0x%lx\n");//type
-	EPRINTF(r_addend, "           :%lu\n");//type
+//	EPRINTF(r_offset, "           :0x%lx\n");//type
+//	//printf("symbol             :%lu\n", ELF64_R_SYM(elf_entity->r_info));
+//	printf("symbol name          :%s\n",get_dyn_syn_name(ELF64_R_SYM(elf_entity->r_info)));
+//	printf("type               :%s\n", get_type(ELF64_R_TYPE(elf_entity->r_info)));
+//	EPRINTF(r_info, "             :0x%lx\n");//type
+//	EPRINTF(r_addend, "           :%lu\n");//type
+//	printf("\n");
+	printf("%s%8lx","0x", elf_entity->r_info);
+	printf("%10s", get_dyn_syn_name(ELF64_R_SYM(elf_entity->r_info)));
+	printf("%10s",get_type(ELF64_R_TYPE(elf_entity->r_info))); 
+	printf("%10lx", elf_entity->r_info);
 	printf("\n");
+
+}
+void print_rela_header()
+{
+	printf("%-10s%-10s%-10s%-10s%-10s\n","offset","symbol name", "type","info", "addend");
 }
 
 void print_real(ELF_t*elf,int type)
 {
+
 	SEC_ITE ite = g_mapSectionHeader.find(type);
 	if(ite != g_mapSectionHeader.end())
 	{
@@ -72,6 +89,7 @@ void print_real(ELF_t*elf,int type)
 }
 void dump_relac(ELF_t*elf)
 {
+	print_rela_header();
 	print_real(elf,SHT_REL);
 	print_real(elf,SHT_RELA);
 

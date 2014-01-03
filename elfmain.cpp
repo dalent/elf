@@ -21,11 +21,12 @@ int main(int argc , char** argv)
 		ERROR_RET("verify failed", -1);
 	}
 
+	section_init(elf);
 	dump_ehdr(elf);
 	dump_section(elf);
-//	dump_symbol(elf);
+	dump_symbol(elf);
 	dump_phdr(elf);
-//	dump_dynamic(elf);
-//	dump_relac(elf);
+	dump_dynamic(elf);
+	dump_relac(elf);
 
 }
