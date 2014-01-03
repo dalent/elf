@@ -29,21 +29,37 @@ static const char * get_type(int type)
 void print_phdr(Elf64_Phdr * elf_entity)
 {
 	//EPRINTF(p_type, "             :%d\n");//type
-	printf("p_type          :%s\n",get_type(elf_entity->p_type));
-	EPRINTF(p_flags, "            :%u\n");//flags
-	EPRINTF(p_offset, "           :0x%lx\n");//flags
-	EPRINTF(p_vaddr, "            :0x%lx\n");//
-	EPRINTF(p_paddr, "            :0x%lx\n");
-	EPRINTF(p_filesz, "           :%lu\n");//link to another section
-	EPRINTF(p_memsz, "            :%lu\n");//section alignment
-	EPRINTF(p_align, "            :%lu\n");//entry size if section hold tables
-	printf("\n");
+//	printf("p_type          :%s\n",get_type(elf_entity->p_type));
+//	EPRINTF(p_flags, "            :%u\n");//flags
+//	EPRINTF(p_offset, "           :0x%lx\n");//flags
+//	EPRINTF(p_vaddr, "            :0x%lx\n");//
+//	EPRINTF(p_paddr, "            :0x%lx\n");
+//	EPRINTF(p_filesz, "           :%lu\n");//link to another section
+//	EPRINTF(p_memsz, "            :%lu\n");//section alignment
+//	EPRINTF(p_align, "            :%lu\n");//entry size if section hold tables
+  	printf("%-20s",get_type(elf_entity->p_type));
+  	printf("%-10u",elf_entity->p_flags);
+  	printf("%-10lx",elf_entity->p_offset);
+  	printf("%-10lx",elf_entity->p_vaddr);
+  	printf("%-10lx",elf_entity->p_paddr);
+  	printf("%-10lu",elf_entity->p_filesz);
+  	printf("%-10lu",elf_entity->p_memsz);
+  	printf("%-10lu",elf_entity->p_align);
 
+	printf("\n");
+}
+void print_phdr_header()
+{
+
+	printf("\n %50s \n", "program header ");
+	printf("%-20s%-10s%-10s%-10s%-10s%-10s%-10s%-10s","type","flags","offset","vaddr","paddr","filesz","memsz","aligin");
+	printf("\n");
 }
 void dump_phdr(ELF_t *elf)
 {
 
 	Elf64_Phdr *phdr = GET_PHDR(elf);	
+	print_phdr_header();
 	for(int i = 0; i <GET_PHDR_SIZE(elf); i++) 
 		print_phdr(&phdr[i]);
 }

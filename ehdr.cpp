@@ -2,7 +2,7 @@
 #include<stdio.h>
 #define CASE_BREAK(type)\
 	case type:         ret=#type; break
-const char* get_ei_type(unsigned short type)
+const char* get_ei_class(unsigned char type)
 {
 	char const *ret;
 	switch(type)
@@ -18,15 +18,38 @@ const char* get_ei_type(unsigned short type)
 
 	return ret;
 }
+const char* get_ei_type(unsigned short type)
+{
+	const char * ret;
+	switch(type)
+	{
+		CASE_BREAK(ET_NONE);
+		CASE_BREAK(ET_REL);
+		CASE_BREAK(ET_EXEC);
+		CASE_BREAK(ET_DYN);
+		CASE_BREAK(ET_CORE);
+		CASE_BREAK(ET_NUM);
+		CASE_BREAK(ET_LOOS);
+		CASE_BREAK(ET_HIOS);
+		CASE_BREAK(ET_LOPROC);
+		CASE_BREAK(ET_HIPROC);
+		default:
+		ret = "unknown";
+		break;
+	}
+
+	return ret;
+}
 void dump_ehdr(ELF_t *elf)
 {
 	Elf64_Ehdr* elf_entity = GET_EHDR(elf);
+	printf("\n %50s \n", "elf header");
 
 	printf("e_ident: ELFMAG0: 0x%x\n", elf_entity->e_ident[0]);
 	printf("e_ident: ELFMAG1: %c\n",   elf_entity->e_ident[1]);
 	printf("e_ident: ELFMAG2: %c\n",   elf_entity->e_ident[2]);
 	printf("e_ident: ELFMAG3: %c\n",   elf_entity->e_ident[3]);
-	printf("e_ident: ELFCLASS: %d\n",elf_entity->e_ident[4]);
+	printf("e_ident: ELFCLASS: %s\n",get_ei_class(elf_entity->e_ident[4]));
 	printf("e_ident: EI_DATA: %d\n",elf_entity->e_ident[5]);
 	printf("e_ident: EI_VERSION: %d\n",elf_entity->e_ident[6]);
 	printf("e_ident: EI_PAD: %d\n",elf_entity->e_ident[7]);
