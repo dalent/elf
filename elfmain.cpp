@@ -22,11 +22,14 @@ int main(int argc , char** argv)
 	}
 
 	section_init(elf);
+	init_symbol_table(elf);
+	init_dynamic_table(elf);
+
 	dump_ehdr(elf);
 	dump_section(elf);
-	dump_symbol(elf);
-	dump_phdr(elf);
-	dump_dynamic(elf);
+//	dump_symbol(elf);
+//	dump_phdr(elf);
+//	dump_dynamic(elf);
 	dump_relac(elf);
 
 }

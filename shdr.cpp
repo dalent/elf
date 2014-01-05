@@ -48,13 +48,13 @@ static const char* get_flag(unsigned cflag)
 	if(cflag &SHF_ALLOC)
 		strcat(flag, "ALLOC|");
 	if(cflag & SHF_MERGE)
-		strcat(flag,"Merge"); 
+		strcat(flag,"Merge|"); 
 	if(SHF_STRINGS & cflag)
-		strcat(flag, "STR");
+		strcat(flag, "STR|");
 	if(cflag & SHF_INFO_LINK)
-		strcat(flag, "INFO_LINK");
+		strcat(flag, "INFO_LINK|");
 	if(cflag & SHF_LINK_ORDER)
-		strcat(flag, "LINK_ORDER");
+		strcat(flag, "LINK_ORDER|");
 
 	return flag;
 }
@@ -64,7 +64,7 @@ void PrintElfSec(Elf64_Shdr*elf_entity, const char * name)
 	//APRINTF(sh_name, "         	  :%-u\n");//section name
 	printf("%-20s", &name[elf_entity->sh_name]);//section name
 	printf("%-15s", get_type(elf_entity->sh_type));//type
-	printf("%-10s", get_flag(elf_entity->sh_flags));//flags
+	printf("%-15s", get_flag(elf_entity->sh_flags));//flags
 //	APRINTF(sh_flags, "%-10lx");//flags
 	APRINTF(sh_addr, "%-10lx");//flags
 	APRINTF(sh_offset, "%-10lx");//
@@ -78,7 +78,7 @@ void PrintElfSec(Elf64_Shdr*elf_entity, const char * name)
 void PrintHeader()
 {
 	printf("\n %50s \n", "section header");
-	printf("%-20s%-15s%-10s%-10s%-10s%-10s%-10s%-10s%-10s%-10s","name","type","flags","addr","offset","size","link","info","addralign","entsize");
+	printf("%-20s%-15s%-15s%-10s%-10s%-10s%-10s%-10s%-10s%-10s","name","type","flags","addr","offset","size","link","info","addralign","entsize");
 	printf("\n");
 }
 
@@ -105,7 +105,7 @@ void section_init(ELF_t*elf)
 	for(int i = 1; i < size; i++)
 	{
 		g_mapSectionHeader[shdr[i].sh_type]
-			.push_back(make_pair(elf_offset(elf,shdr[GET_SYM_TAB_POS(elf)].sh_offset)+shdr[i].sh_name,&shdr[i]));
+			.push_back(make_pair(elf_offset(elf,shdr[GET_SYM_TAB_POS(elf)].sh_offset)+shdr[i].sh_name, &shdr[i]));
 	}
 }
 

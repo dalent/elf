@@ -80,27 +80,47 @@ const char* get_sym_name(ELF_t* elf,unsigned offset)
 
 	return &s_name[offset];
 }
+void print_symbol_header()
+{
+	printf("%10s%5s%10s%10s%10s%10s%30s\n","value","size","type","bind","other","shndx","name"); 
+}
 void printSymbol(Elf64_Sym *elf_entity)
 {
 //	EPRINTF(st_name, "            :%u\n");//name
 //	EPRINTF(st_info, "            :%c\n");//type
 
 	//printf("name             %s\n", symbol_name(elf_head));
-	printf("st_name            :%s\n",get_sym_name(NULL,elf_entity->st_name)); 
-	printf("bind               :%s\n", symbol_bind(*elf_entity));
-	printf("type               :%s\n", symbol_type(*elf_entity));
-	EPRINTF(st_other, "           :%c\n");//type
-	EPRINTF(st_shndx, "           :%hd\n");//type
-	EPRINTF(st_value, "           :0x%lx\n");//type
-	EPRINTF(st_size, "            :%lu\n");//type
+//	printf("st_name            :%s\n",get_sym_name(NULL,elf_entity->st_name)); 
+//	printf("bind               :%s\n", symbol_bind(*elf_entity));
+//	printf("type               :%s\n", symbol_type(*elf_entity));
+//	EPRINTF(st_other, "           :%c\n");//type
+//	EPRINTF(st_shndx, "           :%hd\n");//type
+//	EPRINTF(st_value, "           :0x%lx\n");//type
+//	EPRINTF(st_size, "            :%lu\n");//type
+	printf("%-10lx", elf_entity->st_value); 
+	printf("%-10lu", elf_entity->st_size); 
+	printf("%-10s", symbol_type(*elf_entity)); 
+	printf("%-10s", symbol_bind(*elf_entity)); 
+	printf("%-5c", elf_entity->st_other); 
+	printf("%-10hd", elf_entity->st_shndx); 
+	std::string str = get_sym_name(NULL,elf_entity->st_name);
+	if(str.size() > 30)
+		str=str.substr(0,30);
+
+	printf("%-30s", str.c_str()); 
 	printf("\n");
+}
+void init_symbol_table(ELF_t*elf)
+{
+	//init it
+	get_sym_name(elf,0);
 }
 
 void dump_symbol(ELF_t* elf)
 {
+
 	//init it
 	get_sym_name(elf,0);
-
 	//find the symbol table
 	SEC_ITE ite = g_mapSectionHeader.find(SHT_SYMTAB);
 	if(ite != g_mapSectionHeader.end())
@@ -110,7 +130,10 @@ void dump_symbol(ELF_t* elf)
 		{
 			int size = (*ite_tmp).second->sh_size / (*ite_tmp).second->sh_entsize;
 			Elf64_Sym *sym = (Elf64_Sym*)elf_offset(elf, (*ite_tmp).second->sh_offset);
+			printf("section name %s\n", ite_tmp->first.c_str());
 
+			//print header
+			print_symbol_header();
 			for(int i = 1; i < size; i++)
 				printSymbol(&sym[i]);
 

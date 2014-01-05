@@ -15,7 +15,6 @@ static const char * symbol_type(Elf64_Sym &sym)
 	const char * ret;
 	switch(ELF64_ST_TYPE(sym.st_info))
 	{
-
 		case STB_LOCAL : ret = "STB_LOCAL";	break;
 		case STB_GLOBAL: ret = "STB_GLOBAL"; break;
 		case STB_WEAK  : ret = "STB_WEAK"; break;
@@ -110,13 +109,33 @@ const char* get_dyn_syn_name(unsigned offset)
 	return get_sym_name(NULL,g_vecSym[offset-1]->st_name);
 }
 
+void init_dynamic_table(ELF_t* elf)
+{
+	//init name str
+	get_sym_name(elf,0);
+
+	SEC_ITE ite = g_mapSectionHeader.find(SHT_DYNSYM);
+	if(ite != g_mapSectionHeader.end())
+	{
+		std::vector<pair<string, Elf64_Shdr*> >::iterator ite_tmp =  ite->second.begin();
+		while(ite_tmp != ite->second.end())
+		{
+			int size = (*ite_tmp).second->sh_size / (*ite_tmp).second->sh_entsize;
+			Elf64_Sym *sym = (Elf64_Sym*)elf_offset(elf, (*ite_tmp).second->sh_offset);
+
+			//from 1
+			for(int i = 1; i < size; i++)
+			{
+				g_vecSym.push_back(&sym[i]);
+			}
+
+			ite_tmp++;
+		}
+	}
+}
+
 void dump_dynamic(ELF_t* elf)
 {
-	static int init = 0;
-	//init it
-	if(init == 0)
-		get_sym_name(elf,0);
-
 	//find the symbol table
 	SEC_ITE ite = g_mapSectionHeader.find(SHT_DYNSYM);
 	if(ite != g_mapSectionHeader.end())
@@ -129,16 +148,11 @@ void dump_dynamic(ELF_t* elf)
 
 			for(int i = 1; i < size; i++)
 			{
-				if(init == 0)
-					g_vecSym.push_back(&sym[i]);
-
 				printSymbol(&sym[i]);
 			}
 
 			ite_tmp++;
 		}
 	}
-
-	init = 1;
 }
 
