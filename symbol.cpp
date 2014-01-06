@@ -12,26 +12,6 @@ const char * symbol_type(Elf64_Sym &sym)
 	switch(ELF64_ST_TYPE(sym.st_info))
 	{
 
-		case STB_LOCAL : ret = "STB_LOCAL";	break;
-		case STB_GLOBAL: ret = "STB_GLOBAL"; break;
-		case STB_WEAK  : ret = "STB_WEAK"; break;
-		case STB_NUM   : ret = "STB_NUM"; break;
-		//case STB_LOOS  : ret = "STB_LOOS"; break;
-		case STB_GNU_UNIQUE: ret = "STB_GNU_UNIQUE"; break;
-		case STB_HIOS  : ret = "STB_HIOS"; break;
-		case STB_LOPROC: ret ="STB_LOPROC"; break;
-		case STB_HIPROC: ret = "STB_HIPROC"; break;
-		default: ret = "unknown"; break;
-	}
-
-	return ret;
-}
-
-const char * symbol_bind(Elf64_Sym &sym)
-{
-	const char * ret;
-	switch(ELF64_ST_BIND(sym.st_info))
-	{
 		case STT_NOTYPE : ret = "STT_NOTYPE"; break;
 		case STT_OBJECT : ret = "STT_OBJECT"; break;
 		case STT_FUNC   : ret = "STT_FUNC"  ; break;
@@ -47,6 +27,28 @@ const char * symbol_bind(Elf64_Sym &sym)
 		case STT_HIPROC    : ret = "STT_HIPROC";    break;
 		default :
 			ret = "Unknown"; break;
+
+		}
+
+	return ret;
+}
+
+const char * symbol_bind(Elf64_Sym &sym)
+{
+	const char * ret;
+	switch(ELF64_ST_BIND(sym.st_info))
+	{
+		case STB_LOCAL : ret = "STB_LOCAL";	break;
+		case STB_GLOBAL: ret = "STB_GLOBAL"; break;
+		case STB_WEAK  : ret = "STB_WEAK"; break;
+		case STB_NUM   : ret = "STB_NUM"; break;
+		//case STB_LOOS  : ret = "STB_LOOS"; break;
+		case STB_GNU_UNIQUE: ret = "STB_GNU_UNIQUE"; break;
+		case STB_HIOS  : ret = "STB_HIOS"; break;
+		case STB_LOPROC: ret ="STB_LOPROC"; break;
+		case STB_HIPROC: ret = "STB_HIPROC"; break;
+		default: ret = "unknown"; break;
+
 	}
 
 	return ret;
@@ -80,9 +82,34 @@ const char* get_sym_name(ELF_t* elf,unsigned offset)
 
 	return &s_name[offset];
 }
-void print_symbol_header()
+static const char* get_other(char other)
 {
-	printf("%10s%5s%10s%10s%10s%10s%30s\n","value","size","type","bind","other","shndx","name"); 
+	const char* ret;
+	switch(ELF64_ST_VISIBILITY(other))
+	{
+		case STV_DEFAULT:
+			ret = "STV_DEFAULT";
+			break;
+		case STV_INTERNAL:
+			ret = "STV_INTERNAL";
+			break;
+		case STV_HIDDEN:
+			ret = "STV_HIDDEN";
+			break;
+		case STV_PROTECTED:
+			ret ="STV_PROTECTED";
+			break;
+
+		dafault:
+			ret = "unknown";
+			break;
+	}
+
+	return ret;
+}
+static void print_symbol_header()
+{
+	printf("%-10s%-5s%-15s%-15s%-15s%-10s%-60s\n","value","size","type","bind","other","shndx","name"); 
 }
 void printSymbol(Elf64_Sym *elf_entity)
 {
@@ -98,16 +125,17 @@ void printSymbol(Elf64_Sym *elf_entity)
 //	EPRINTF(st_value, "           :0x%lx\n");//type
 //	EPRINTF(st_size, "            :%lu\n");//type
 	printf("%-10lx", elf_entity->st_value); 
-	printf("%-10lu", elf_entity->st_size); 
-	printf("%-10s", symbol_type(*elf_entity)); 
-	printf("%-10s", symbol_bind(*elf_entity)); 
-	printf("%-5c", elf_entity->st_other); 
+	printf("%-5lu", elf_entity->st_size); 
+	printf("%-15s", symbol_type(*elf_entity)); 
+	printf("%-15s", symbol_bind(*elf_entity)); 
+	//because it is reserved, so i don't want to show it
+	printf("%-15s", get_other(elf_entity->st_other)); 
 	printf("%-10hd", elf_entity->st_shndx); 
 	std::string str = get_sym_name(NULL,elf_entity->st_name);
-	if(str.size() > 30)
-		str=str.substr(0,30);
+	if(str.size() > 60)
+		str=str.substr(0,60);
 
-	printf("%-30s", str.c_str()); 
+	printf("%-60s", str.c_str()); 
 	printf("\n");
 }
 void init_symbol_table(ELF_t*elf)

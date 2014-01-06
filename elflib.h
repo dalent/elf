@@ -57,6 +57,9 @@ extern const char* get_dyn_syn_name(unsigned offset);
 extern void section_init(ELF_t*elf);
 extern void init_symbol_table(ELF_t*elf);
 extern void init_dynamic_table(ELF_t* elf);
+extern void dump_phdr_dynamic(ELF_t* elf);
+extern void init_phdr(ELF_t *elf);
+
 //for now i moved it here
 #include<map>
 #include<string>

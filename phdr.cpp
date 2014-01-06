@@ -1,4 +1,6 @@
 #include"elflib.h"
+#include<map>
+using namespace std;
 #define CASE_NAME(name) \
 	case name: ret = #name;break; 
 static const char * get_type(int type)
@@ -26,6 +28,21 @@ static const char * get_type(int type)
 
 	return ret;
 }
+static const char* get_flag(int flag)
+{
+	static char ret[10];
+	memset(ret ,0 , 10);
+	if(flag & PF_X)
+		strcat(ret,"X|");
+	if(flag & PF_W)
+		strcat(ret, "W|");
+	if(flag& PF_R)
+		strcat(ret, "R|");
+
+	return ret;
+
+
+}
 void print_phdr(Elf64_Phdr * elf_entity)
 {
 	//EPRINTF(p_type, "             :%d\n");//type
@@ -38,7 +55,7 @@ void print_phdr(Elf64_Phdr * elf_entity)
 //	EPRINTF(p_memsz, "            :%lu\n");//section alignment
 //	EPRINTF(p_align, "            :%lu\n");//entry size if section hold tables
   	printf("%-20s",get_type(elf_entity->p_type));
-  	printf("%-10u",elf_entity->p_flags);
+  	printf("%-10s",get_flag(elf_entity->p_flags));
   	printf("%-10lx",elf_entity->p_offset);
   	printf("%-10lx",elf_entity->p_vaddr);
   	printf("%-10lx",elf_entity->p_paddr);
@@ -54,6 +71,14 @@ void print_phdr_header()
 	printf("\n %50s \n", "program header ");
 	printf("%-20s%-10s%-10s%-10s%-10s%-10s%-10s%-10s","type","flags","offset","vaddr","paddr","filesz","memsz","aligin");
 	printf("\n");
+}
+std::map<unsigned,Elf64_Phdr*> g_mapPhdr; 
+void init_phdr(ELF_t *elf)
+{
+	Elf64_Phdr *phdr = GET_PHDR(elf);	
+	for(int i = 0; i <GET_PHDR_SIZE(elf); i++)
+		g_mapPhdr[phdr[i].p_type] =  &phdr[i];
+
 }
 void dump_phdr(ELF_t *elf)
 {
