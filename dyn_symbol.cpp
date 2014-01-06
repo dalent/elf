@@ -193,6 +193,7 @@ void dump_dynamic(ELF_t* elf)
 		{
 			int size = (*ite_tmp).second->sh_size / (*ite_tmp).second->sh_entsize;
 			Elf64_Sym *sym = (Elf64_Sym*)elf_offset(elf, (*ite_tmp).second->sh_offset);
+			printf("%40s\n", ite_tmp->first.c_str());
 			print_symbol_header();
 
 			for(int i = 1; i < size; i++)
