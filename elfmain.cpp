@@ -30,8 +30,8 @@ int main(int argc , char** argv)
 //	dump_section(elf);
 //	dump_symbol(elf);
 	dump_phdr(elf);
-//	dump_dynamic(elf);
-	dump_relac(elf);
-	dump_phdr_dynamic(elf);
+	dump_dynamic(elf);
+//	dump_relac(elf);
+//	dump_phdr_dynamic(elf);
 
 }

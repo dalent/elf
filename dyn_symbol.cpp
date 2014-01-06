@@ -172,7 +172,7 @@ void init_dynamic_table(ELF_t* elf)
 			Elf64_Sym *sym = (Elf64_Sym*)elf_offset(elf, (*ite_tmp).second->sh_offset);
 
 			//from 1
-			for(int i = 1; i < size; i++)
+			for(int i = 0; i < size; i++)
 			{
 				g_vecSym.push_back(&sym[i]);
 			}

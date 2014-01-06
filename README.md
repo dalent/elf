@@ -13,5 +13,8 @@ it read the
 when exe file execute ,first the loader will loader the exe file to memory,
 second it will find the elf header and get the program header content, it will
 load the PT_LOAD type content to the virtual address.
-after that it will find the content need to relocated ,named the reloc :w
+after that it will find the content need to relocated ,named the rela/relac
+
+two type R_386_GLOB_DAT refering the global offset table.
+R_386_JMP_SLOT refering the procedure linkage table
 
