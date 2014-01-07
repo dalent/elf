@@ -21,7 +21,20 @@ int main(int argc , char** argv)
 		{0,              0,          0, 0 }
 	};
 	int opt;
-	while((opt=getopt_long(argc,argv,"eSpsdr",long_options, NULL))!=-1);
+	while((opt=getopt_long(argc,argv,"eSpsdrh",long_options, NULL))!=-1)
+	{
+		switch(opt)
+		{
+			case 'h':
+			{
+				for(int i = 0; i < sizeof(long_options)/sizeof(option); i++)
+				{
+					printf("-%c  --%s\n",(char)long_options[i].val,long_options[i].name);
+				}
+				return 0;
+			}
+		}
+	}
 
 	elf = new ELF_t;
 
