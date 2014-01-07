@@ -27,6 +27,7 @@ int main(int argc , char** argv)
 		{
 			case 'h':
 			{
+				printf("./elfreader [option] filename\n");
 				for(int i = 0; i < sizeof(long_options)/sizeof(option); i++)
 				{
 					printf("-%c  --%s\n",(char)long_options[i].val,long_options[i].name);
@@ -82,6 +83,7 @@ int main(int argc , char** argv)
 				break;
 			case 'h':
 				{
+					printf("./elfreader [option] filename\n");
 					for(int i = 0; i < sizeof(long_options)/sizeof(option); i++)
 					{
 						printf("-%c  --%s\n",(char)long_options[i].val,long_options[i].name);
