@@ -37,6 +37,16 @@ int main(int argc , char** argv)
 		}
 	}
 
+	if(optind == 1)// no option 
+	{
+		printf("./elfreader [option] filename\n");
+		for(int i = 0; i < sizeof(long_options)/sizeof(option); i++)
+		{
+			printf("-%c  --%s\n",(char)long_options[i].val,long_options[i].name);
+		}
+		return -1;
+	}
+
 	elf = new ELF_t;
 
 	if(open_elf(elf, argv[optind]) != 0)
@@ -61,7 +71,8 @@ int main(int argc , char** argv)
 		switch(opt)
 		{
 			case 0:// it means dyn_symbol
-				dump_dynamic(elf);
+				dump_phdr_dynamic(elf);
+				break;
 
 			case 'e':
 				dump_ehdr(elf);
@@ -76,7 +87,7 @@ int main(int argc , char** argv)
 				dump_symbol(elf);
 				break;
 			case 'd':
-				dump_phdr_dynamic(elf);
+				dump_dynamic(elf);
 				break;
 			case 'r':
 				dump_relac(elf);
